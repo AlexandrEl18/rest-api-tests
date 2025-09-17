@@ -1,0 +1,81 @@
+
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "total": {
+      "type": "integer"
+    },
+    "used": {
+      "type": "integer"
+    },
+    "queued": {
+      "type": "integer"
+    },
+    "pending": {
+      "type": "integer"
+    },
+    "browsers": {
+      "type": "object",
+      "properties": {
+        "chrome": {
+          "type": "object",
+          "properties": {
+            "127.0": {
+              "type": "object"
+            },
+            "128.0": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "127.0",
+            "128.0"
+          ]
+        },
+        "firefox": {
+          "type": "object",
+          "properties": {
+            "124.0": {
+              "type": "object"
+            },
+            "125.0": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "124.0",
+            "125.0"
+          ]
+        },
+        "opera": {
+          "type": "object",
+          "properties": {
+            "108.0": {
+              "type": "object"
+            },
+            "109.0": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "108.0",
+            "109.0"
+          ]
+        }
+      },
+      "required": [
+        "chrome",
+        "firefox",
+        "opera"
+      ]
+    }
+  },
+  "required": [
+    "total",
+    "used",
+    "queued",
+    "pending",
+    "browsers"
+  ]
+}
