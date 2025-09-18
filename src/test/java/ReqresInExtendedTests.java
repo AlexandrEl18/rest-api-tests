@@ -6,11 +6,13 @@ import models.pojo.LoginResponsePojoModel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static helpers.CustomAllureListener.withCustomTemplates;
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.hamcrest.Matchers.is;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -201,6 +203,29 @@ public class ReqresInExtendedTests {
                 assertThat(response.getToken()).isEqualTo("QpwL5tke4Pnpja7X4");
             });
         }
+        //вариант параметризованного теста с возможностью прокидывать данные в терминал
+    @ParameterizedTest
+    @ValueSource(strings = {"default"})
+    void loginWithParamsFromTerminal(String ignored) {
+        String email = System.getProperty("login", "eve.holt@reqres.in"); // дефолтное значение
+        String password = System.getProperty("password", "cityslicka");
+
+        LoginBodyLombokModel loginBody = new LoginBodyLombokModel();
+        loginBody.setEmail(email);
+        loginBody.setPassword(password);
+
+        given(loginRequestSpec)
+                .body(loginBody)
+                .post()
+                .then()
+                .statusCode(200)
+                .body("token", notNullValue());
+
+//        ./gradlew test \
+//        -Dlogin="eve.holt@reqres.in" \
+//        -Dpassword="cityslicka" \
+//        --tests "ReqresInExtendedTests.loginWithParamsFromTerminal"
+    }
     }
 
 
