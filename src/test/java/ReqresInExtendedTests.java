@@ -1,15 +1,18 @@
+import io.qameta.allure.restassured.AllureRestAssured;
 import models.lombok.LoginBodyLombokModel;
 import models.lombok.LoginResponseLombokModel;
 import models.pojo.LoginBodyPojoModel;
 import models.pojo.LoginResponsePojoModel;
 import org.junit.jupiter.api.Test;
+import static helpers.CustomAllureListener.withCustomTemplates;
+import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.hamcrest.Matchers.is;
 import static org.assertj.core.api.Assertions.assertThat;
-
-
+import static specs.LoginSpec.loginRequestSpec;
+import static specs.LoginSpec.loginResponseSpec;
 
 public class ReqresInExtendedTests {
     @Test
@@ -38,7 +41,6 @@ public class ReqresInExtendedTests {
         loginBody.setEmail("eve.holt@reqres.in");
         loginBody.setPassword("cityslicka");
 
-
         LoginResponsePojoModel response= given()
                 .log().uri()
                 .header("x-api-key", "reqres-free-v1")
@@ -57,11 +59,9 @@ public class ReqresInExtendedTests {
     }
     @Test
     void successfulLoginWithLombokTest() {
-
         LoginBodyLombokModel loginBody=new LoginBodyLombokModel();
         loginBody.setEmail("eve.holt@reqres.in");
         loginBody.setPassword("cityslicka");
-
 
         LoginResponseLombokModel response= given()
                 .log().uri()
@@ -77,6 +77,97 @@ public class ReqresInExtendedTests {
 
         //assertEquals("QpwL5tke4Pnpja7X4",response.getToken()); //проверка J-UNIT-5
         assertThat(response.getToken()).isEqualTo("QpwL5tke4Pnpja7X4");// проверка assertj
+    }
+//подключили allure
+    @Test
+    void successfulLoginWithLombokAllureTest() {
+        LoginBodyLombokModel loginBody=new LoginBodyLombokModel();
+        loginBody.setEmail("eve.holt@reqres.in");
+        loginBody.setPassword("cityslicka");
 
+        LoginResponseLombokModel response= given()
+                .filter(new AllureRestAssured())
+                .log().uri()
+                .header("x-api-key", "reqres-free-v1")
+                .contentType(JSON)
+                .body(loginBody)
+                .post("https://reqres.in/api/login")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(200)
+                .extract().as(LoginResponseLombokModel.class);
+
+        //assertEquals("QpwL5tke4Pnpja7X4",response.getToken()); //проверка J-UNIT-5
+        assertThat(response.getToken()).isEqualTo("QpwL5tke4Pnpja7X4");// проверка assertj
+    }
+    // сделали отчет более красивым
+    @Test
+    void successfulLoginWithCustomLombokAllureTest() {
+        LoginBodyLombokModel loginBody=new LoginBodyLombokModel();
+        loginBody.setEmail("eve.holt@reqres.in");
+        loginBody.setPassword("cityslicka");
+
+        LoginResponseLombokModel response= given()
+                .filter(withCustomTemplates())
+                .log().uri()
+                .header("x-api-key", "reqres-free-v1")
+                .contentType(JSON)
+                .body(loginBody)
+                .post("https://reqres.in/api/login")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(200)
+                .extract().as(LoginResponseLombokModel.class);
+
+        //assertEquals("QpwL5tke4Pnpja7X4",response.getToken()); //проверка J-UNIT-5
+        assertThat(response.getToken()).isEqualTo("QpwL5tke4Pnpja7X4");// проверка assertj
+    }
+    //добавили step-ики
+    @Test
+    void successfulLoginWithCustomLombokAllureStepsTest() {
+        step("Prepare test");
+        LoginBodyLombokModel loginBody=new LoginBodyLombokModel();
+        loginBody.setEmail("eve.holt@reqres.in");
+        loginBody.setPassword("cityslicka");
+
+        LoginResponseLombokModel response= step("Make request",()->
+        given()
+                .filter(withCustomTemplates())
+                .log().uri()
+                .header("x-api-key", "reqres-free-v1")
+                .contentType(JSON)
+                .body(loginBody)
+                .post("https://reqres.in/api/login")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(200)
+                .extract().as(LoginResponseLombokModel.class));
+        step("Verify response",()->
+        //assertEquals("QpwL5tke4Pnpja7X4",response.getToken()); //проверка J-UNIT-5
+                assertThat(response.getToken()).isEqualTo("QpwL5tke4Pnpja7X4"));// проверка assertj
+//   ./gradlew test allureServe  для запуска через терминал
+    }
+    @Test
+    void successfulLoginWithCustomLombokAllureStepsSpecTest() {
+        step("Prepare test");
+        LoginBodyLombokModel loginBody=new LoginBodyLombokModel();
+        loginBody.setEmail("eve.holt@reqres.in");
+        loginBody.setPassword("cityslicka");
+
+        LoginResponseLombokModel response= step("Make request",()->
+                given(loginRequestSpec)
+                        //.spec(loginRequestSpec) так тоже можно
+                        .body(loginBody)
+                        .post()
+                        .then()
+                        .spec(loginResponseSpec)
+                        .extract().as(LoginResponseLombokModel.class));
+        step("Verify response",()->
+                //assertEquals("QpwL5tke4Pnpja7X4",response.getToken()); //проверка J-UNIT-5
+                assertThat(response.getToken()).isEqualTo("QpwL5tke4Pnpja7X4"));// проверка assertj
+//   ./gradlew test allureServe  для запуска через терминал
     }
 }

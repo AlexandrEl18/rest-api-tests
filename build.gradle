@@ -1,24 +1,40 @@
 plugins {
     id 'java-library'
     id 'io.freefair.lombok' version '8.10'
+    id 'io.qameta.allure' version '2.9.6' // рабочая версия для Gradle Plugin Portal
 }
+
 repositories {
     mavenCentral()
 }
-def restAssuredVersion = "5.5.6",
-    slf4jVersion = "2.0.7"
+
+def versions = [
+        restAssured       : "5.5.6",
+        slf4j             : "2.0.7",
+        junit             : "5.9.2",
+        assertj           : "3.26.3",
+        allureCli         : "2.22.1",
+        allureRestAssured : "2.22.1",
+        allureJunit5      : "2.22.1"
+]
 
 dependencies {
-    testImplementation "org.junit.jupiter:junit-jupiter:5.9.2"
-    testImplementation "org.slf4j:slf4j-simple:$slf4jVersion"
-    testImplementation "io.rest-assured:rest-assured:$restAssuredVersion"
-    testImplementation "org.assertj:assertj-core:3.26.3"
-    testImplementation "io.rest-assured:json-schema-validator:5.5.6"
+    testImplementation "org.junit.jupiter:junit-jupiter:${versions.junit}"
+    testImplementation "org.slf4j:slf4j-simple:${versions.slf4j}"
+    testImplementation "io.rest-assured:rest-assured:${versions.restAssured}"
+    testImplementation "io.rest-assured:json-schema-validator:${versions.restAssured}"
+    testImplementation "org.assertj:assertj-core:${versions.assertj}"
+    testImplementation "io.qameta.allure:allure-rest-assured:${versions.allureRestAssured}"
+    testImplementation "io.qameta.allure:allure-junit5:${versions.allureJunit5}"
+}
+
+allure {
+    version = versions.allureCli
+    autoconfigure = true
 }
 
 tasks.withType(Test) {
     useJUnitPlatform()
-
     testLogging {
         lifecycle {
             events "started", "skipped", "failed", "standard_error", "standard_out"
