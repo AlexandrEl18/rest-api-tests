@@ -20,4 +20,6 @@ public class LoginBodyPojoModel {
     public void setPassword(String password) {
         this.password = password;
     }
-}
+
+
+    }

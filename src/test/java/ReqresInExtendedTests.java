@@ -4,6 +4,9 @@ import models.lombok.LoginResponseLombokModel;
 import models.pojo.LoginBodyPojoModel;
 import models.pojo.LoginResponsePojoModel;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
 import static helpers.CustomAllureListener.withCustomTemplates;
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
@@ -170,4 +173,35 @@ public class ReqresInExtendedTests {
                 assertThat(response.getToken()).isEqualTo("QpwL5tke4Pnpja7X4"));// проверка assertj
 //   ./gradlew test allureServe  для запуска через терминал
     }
-}
+
+    @ParameterizedTest(name = "Login with email={0}, password={1}")
+    @CsvSource(value = {"eve.holt@reqres.in:cityslicka",   // валидные данные
+                "tEst:test",                       // невалидные данные
+                "Java:java"                        // ещё один вариант
+        }, delimiter = ':')
+        void successfulLoginParametrizedTest(String login, String password) {
+            step("Prepare login body", () -> {
+                // создаём тело запроса через Lombok-модель
+            });
+            LoginBodyLombokModel loginBody = new LoginBodyLombokModel();
+            loginBody.setEmail(login);
+            loginBody.setPassword(password);
+
+            LoginResponseLombokModel response = step("Make request", () ->
+                    given(loginRequestSpec)
+                            .body(loginBody)
+                            .when()
+                            .post()
+                            .then()
+                            .spec(loginResponseSpec)   // проверка кода 200 + наличие токена
+                            .extract().as(LoginResponseLombokModel.class)
+            );
+
+            step("Verify response", () -> {
+                assertThat(response.getToken()).isEqualTo("QpwL5tke4Pnpja7X4");
+            });
+        }
+    }
+
+
+
