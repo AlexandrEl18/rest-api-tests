@@ -1,7 +1,7 @@
 import org.junit.jupiter.api.Test;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.* ;
 
 public class ReqresInTests {
 
@@ -75,6 +75,34 @@ public class ReqresInTests {
                 .log().status()
                 .log().body()
                 .statusCode(415);
+    }
+    @Test
+    void successfulDeleteUserTest() {
+        given()
+                .log().uri()
+                .header("x-api-key", "reqres-free-v1") // если требуется
+                .contentType(JSON)
+                .when()
+                .delete("https://reqres.in/api/users/2")
+                .then()
+                .log().status()
+                .statusCode(204); // Проверяем, что статус 204
+    }
+    @Test
+    void getUnknownResourcesTest() {
+        given()
+                .log().uri()
+                .header("x-api-key", "reqres-free-v1") // если требуется
+                .when()
+                .get("https://reqres.in/api/unknown")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(200)
+                .body("data", hasSize(6)) // проверяем, что в data 6 элементов
+                .body("data[0].id", equalTo(1)) // проверяем id первого элемента
+                .body("data[0].name", equalTo("cerulean")) // проверяем имя первого элемента
+                .body("support.url", notNullValue()); // проверяем, что поле support.url есть
     }
 
 }
